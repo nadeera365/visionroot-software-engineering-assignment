@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CreateRequest from "./pages/CreateRequest";
 import EditRequest from "./pages/EditRequest";
 import RequestDetails from "./pages/RequestDetails";
+import AdminRequestDetails from "./pages/AdminRequestDetails";
 
 function HomeRedirect() {
   const { account, loading } = useAuth();
@@ -75,6 +76,14 @@ export default function App() {
         element={
           <ProtectedRoute roles={["ADMIN"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/requests/:id"
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <AdminRequestDetails />
           </ProtectedRoute>
         }
       />

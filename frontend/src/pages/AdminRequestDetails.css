@@ -1,0 +1,184 @@
+.admin-request-page {
+  width: min(900px, calc(100% - 32px));
+  margin: 40px auto;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.admin-request-card,
+.request-user-card,
+.status-update-card {
+  margin-bottom: 20px;
+  padding: 26px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 5px 20px rgba(22, 34, 51, 0.07);
+}
+
+.admin-request-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-request-title h1 {
+  margin: 4px 0 24px;
+}
+
+.request-reference {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.admin-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.status-in-progress {
+  color: #1e40af;
+  background: #dbeafe;
+}
+
+.status-resolved {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.status-cancelled {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.admin-request-information {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-request-information div {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-request-information span {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.description-section {
+  margin-top: 24px;
+}
+
+.description-section h2,
+.request-user-card h2,
+.status-update-card h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.description-section p {
+  margin-bottom: 0;
+  color: #475569;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.request-user-card p {
+  margin: 8px 0;
+}
+
+.status-update-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.status-update-form label {
+  display: grid;
+  flex: 1;
+  gap: 7px;
+  font-weight: 600;
+}
+
+.status-update-form select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+}
+
+.status-update-form button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  background: #2563eb;
+}
+
+.status-update-form button:hover {
+  background: #1d4ed8;
+}
+
+.status-update-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.terminal-message {
+  margin-bottom: 0;
+  padding: 13px;
+  border-radius: 8px;
+  color: #475467;
+  background: #f1f5f9;
+}
+
+.admin-details-message {
+  margin-top: 80px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .admin-request-page {
+    margin-top: 20px;
+  }
+
+  .admin-request-title {
+    flex-direction: column;
+  }
+
+  .admin-request-information {
+    grid-template-columns: 1fr;
+  }
+
+  .status-update-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
