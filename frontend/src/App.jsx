@@ -9,6 +9,7 @@ import CreateRequest from "./pages/CreateRequest";
 import EditRequest from "./pages/EditRequest";
 import RequestDetails from "./pages/RequestDetails";
 import AdminRequestDetails from "./pages/AdminRequestDetails";
+import ManageUsers from "./pages/ManageUsers";
 
 function HomeRedirect() {
   const { account, loading } = useAuth();
@@ -84,6 +85,14 @@ export default function App() {
         element={
           <ProtectedRoute roles={["ADMIN"]}>
             <AdminRequestDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <ManageUsers />
           </ProtectedRoute>
         }
       />
