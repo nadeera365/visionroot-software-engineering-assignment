@@ -1,44 +1,41 @@
 import express from "express";
+import helmet from "helmet";
 import cors from "cors";
-import authRoutes from "./routes/auth.routes.js";
-import requestRoutes from "./routes/request.routes.js";
-import userRoutes from "./routes/user.routes.js";
-import { errorHandler } from "./middleware/errorHandler.js";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoutes.js";
+import requestRoutes from "./routes/requestRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js";
+import { checkOrigin, protectWrites, createLimiter } from "./middleware/security.js";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
-const app = express();
-
-app.disable("x-powered-by");
-
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+// Tests create the same app without binding a fixed port.
+export default function createApp(config) {
+  const app = express();
+  app.locals.config = config;
+  app.disable("x-powered-by");
+  app.set("query parser", "simple");
+  app.use(helmet());
+  app.use("/api", createLimiter(config.apiRateLimit));
+  app.use(checkOrigin);
+  app.use(cors({
+    origin: config.clientOrigin,
     credentials: true,
-  })
-);
-
-app.use(express.json());
-
-// This checks the HTTP server only
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Service Request API is running",
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "X-Requested-With"],
+  }));
+  app.use(protectWrites);
+  app.use(express.json({ limit: "16kb" }));
+  app.use(cookieParser());
+  app.use("/api", (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
   });
-});
-
-app.use("/api/auth", authRoutes);
-app.use("/api/requests", requestRoutes);
-app.use("/api/users", userRoutes);
-
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
-
-
-app.use(errorHandler);
-
-export default app;
+  app.use("/api/health", healthRoutes);
+  app.use("/api/auth", authRoutes(createLimiter(config.authRateLimit, true)));
+  app.use("/api/requests", requestRoutes);
+  app.use("/api/users", userRoutes);
+  app.use(notFound);
+  app.use(errorHandler);
+  return app;
+}

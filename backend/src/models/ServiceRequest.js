@@ -41,14 +41,15 @@ const serviceRequestSchema = new mongoose.Schema(
       immutable: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { versionKey: false } }
 );
 
+// Support each user's request list and the admin's request lists.
 serviceRequestSchema.index({ createdBy: 1, createdAt: -1, _id: -1 });
 serviceRequestSchema.index({ createdAt: -1, _id: -1 });
 serviceRequestSchema.index({ status: 1, createdAt: -1, _id: -1 });
 
-// Keyword search
+// Support the required keyword search over titles and descriptions.
 serviceRequestSchema.index({ title: "text", description: "text" });
 
 const ServiceRequest = mongoose.model(

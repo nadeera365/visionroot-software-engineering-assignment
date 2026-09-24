@@ -44,6 +44,8 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.index({ createdAt: -1, _id: -1 });
+
 // Also hide internal fields when a document is converted to JSON.
 userSchema.set("toJSON", {
   transform(_document, result) {

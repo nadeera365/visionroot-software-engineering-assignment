@@ -1,63 +1,39 @@
-import { verifyToken } from "../utils/jwt.js";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Admin from "../models/Admin.js";
+import ApiError from "../utils/ApiError.js";
+import { COOKIE_NAME, JWT_OPTIONS, clearSessionCookie } from "../utils/session.js";
 
 export async function requireAuth(req, res, next) {
+  const config = req.app.locals.config;
+  const token = req.cookies[COOKIE_NAME];
+  let claims;
   try {
-    const header = req.headers.authorization || "";
-    const [scheme, token] = header.split(" ");
-
-    if (scheme !== "Bearer" || !token) {
-      return res.status(401).json({
-        success: false,
-        message: "Missing or invalid Authorization header.",
-      });
-    }
-
-    let payload;
-    try {
-      payload = verifyToken(token);
-    } catch {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid or expired token.",
-      });
-    }
-
-    const Model = payload.role === "ADMIN" ? Admin : User;
-    const account = await Model.findById(payload.sub).select(
-      "+tokenVersion"
-    );
-
-    if (!account || !account.isActive) {
-      return res.status(401).json({
-        success: false,
-        message: "Account no longer available.",
-      });
-    }
-
-    if (account.tokenVersion !== payload.tokenVersion) {
-      return res.status(401).json({
-        success: false,
-        message: "Session has been invalidated. Please log in again.",
-      });
-    }
-
-    req.auth = { id: account._id, role: payload.role };
-    next();
-  } catch (error) {
-    next(error);
+    claims = jwt.verify(token, config.jwtSecret, JWT_OPTIONS);
+  } catch {
+    clearSessionCookie(res, config);
+    throw new ApiError(401, "Please log in to continue.");
   }
+  if (!claims || typeof claims !== "object" || !["USER", "ADMIN"].includes(claims.role)
+      || !mongoose.isObjectIdOrHexString(claims.sub) || !Number.isSafeInteger(claims.tokenVersion)) {
+    throw new ApiError(401, "Please log in to continue.");
+  }
+
+  const Account = claims.role === "ADMIN" ? Admin : User;
+  const account = await Account.findById(claims.sub).select("+tokenVersion");
+  if (!account || !account.isActive || account.role !== claims.role || account.tokenVersion !== claims.tokenVersion) {
+    clearSessionCookie(res, config);
+    throw new ApiError(401, "Your session has ended. Please log in again.");
+  }
+  req.user = account;
+  req.accountModel = Account;
+  next();
 }
 
-export function requireRole(...allowedRoles) {
+export function requireRole(role) {
   return (req, res, next) => {
-    if (!req.auth || !allowedRoles.includes(req.auth.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "You don't have permission to do this.",
-      });
-    }
+    if (req.user.role !== role) throw new ApiError(403, "You do not have permission to do this.");
     next();
   };
 }

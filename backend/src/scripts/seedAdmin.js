@@ -1,45 +1,27 @@
-import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
-import connectDB from "../config/db.js";
-import Admin from "../models/Admin.js";
-
-const SALT_ROUNDS = 10;
+import bcrypt from "bcrypt";
+import connectDB from "../src/config/db.js";
+import Admin from "../src/models/Admin.js";
+import { registerSchema } from "../src/validation/schemas.js";
 
 async function seedAdmin() {
-  const name = process.env.ADMIN_NAME;
-  const email = process.env.ADMIN_EMAIL?.toLowerCase().trim();
-  const password = process.env.ADMIN_PASSWORD;
-
-  if (!name || !email || !password) {
-    throw new Error(
-      "Set ADMIN_NAME, ADMIN_EMAIL, and ADMIN_PASSWORD in backend/.env before running this script."
-    );
-  }
-  if (password.length < 8) {
-    throw new Error("ADMIN_PASSWORD must be at least 8 characters.");
-  }
-
+  const result = registerSchema.safeParse({
+    name: process.env.ADMIN_NAME, email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD,
+  });
+  if (!result.success) throw new Error("Set valid ADMIN_NAME, ADMIN_EMAIL and ADMIN_PASSWORD values in backend/.env.");
   await connectDB();
-
-  const existing = await Admin.findOne({ email });
-  if (existing) {
-    console.log(`An admin with email "${email}" already exists — nothing to do.`);
+  await Admin.init();
+  const { name, email, password } = result.data;
+  if (await Admin.exists({ email })) {
+    console.log("Admin already exists. Its credentials were not changed.");
     return;
   }
-
-  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const admin = await Admin.create({ name, email, passwordHash });
-
-  console.log("Admin account created:");
-  console.log(`  email: ${admin.email}`);
-  console.log(`  id:    ${admin._id}`);
+  const passwordHash = await bcrypt.hash(password, 12);
+  await Admin.create({ name, email, passwordHash });
+  console.log("Admin created. Log in using the Admin option and your local credentials.");
 }
 
-seedAdmin()
-  .catch((error) => {
-    console.error(error.message);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await mongoose.disconnect();
-  });
+seedAdmin().catch((error) => {
+  console.error(error.name === "Error" ? error.message : `Admin seed failed (${error.name}).`);
+  process.exitCode = 1;
+}).finally(() => mongoose.disconnect());
