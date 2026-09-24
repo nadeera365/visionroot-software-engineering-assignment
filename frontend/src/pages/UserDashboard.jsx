@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { apiRequest } from "../api/api";
 import { useAuth } from "../context/AuthContext";
 import "./UserDashboard.css";
+import "./Dashboard.css";
 
 export default function UserDashboard() {
   const { account, logout } = useAuth();

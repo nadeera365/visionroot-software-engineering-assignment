@@ -1,0 +1,96 @@
+.request-form-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.request-form {
+  width: min(700px, 100%);
+  margin: 0 auto;
+  padding: 30px;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+.form-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.form-heading h1 {
+  margin: 0 0 7px;
+}
+
+.form-heading p {
+  margin: 0;
+  color: #64748b;
+}
+
+.form-heading a {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.request-form label {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.request-form input,
+.request-form textarea,
+.request-form select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+}
+
+.request-form textarea {
+  resize: vertical;
+}
+
+.request-form input:focus,
+.request-form textarea:focus,
+.request-form select:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.15);
+  border-color: #2563eb;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.request-form > button {
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  background: #2563eb;
+}
+
+.request-form > button:disabled {
+  opacity: 0.65;
+}
+
+@media (max-width: 600px) {
+  .request-form {
+    padding: 22px 17px;
+  }
+
+  .form-heading {
+    flex-direction: column;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
